@@ -1,0 +1,29 @@
+[project]
+name = "open-infra-intel"
+version = "0.1.0"
+description = "Open Infrastructure Intelligence for Malicious Domain Detection -- an exploratory, fully reproducible MANTIS (IEEE S&P 2025) replication on free active-DNS data, testing whether TDA features improve over lexical+hosting features and a GraphSAGE GNN encoder."
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "requests>=2.31",
+    "tldextract>=5.1",
+    "networkx>=3.0",
+    "pandas>=2.0,<3",
+    "numpy>=1.26,<2",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "xgboost>=2.0",
+    "torch>=2.1,<2.3",
+    "networkit>=11.0",
+    "GraphRicciCurvature>=0.5",
+    "ripser>=0.6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
