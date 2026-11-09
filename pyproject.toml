@@ -1,7 +1,7 @@
 [project]
 name = "open-infra-intel"
 version = "0.1.0"
-description = "Open Infrastructure Intelligence for Malicious Domain Detection -- an exploratory, fully reproducible MANTIS (IEEE S&P 2025) replication on free active-DNS data, testing whether TDA features improve over lexical+hosting features and a GraphSAGE GNN encoder."
+description = "Open Infrastructure Intelligence for Malicious Domain Detection -- an exploratory, fully reproducible MANTIS-inspired (IEEE S&P 2025, arXiv:2502.09788) active-DNS implementation, testing whether topological features improve over lexical+hosting features and a GraphSAGE GNN encoder."
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "requests>=2.31",

@@ -20,7 +20,7 @@ from mantis.graph import build_hosting_graph, graph_summary
 from mantis.ingest import cymru_bulk_asn, fetch_phishing_db_domains, fetch_tranco_domains, resolve_many
 from mantis_poc import _load_or_build_feature_table
 
-DEFAULT_CACHE = pathlib.Path(__file__).parent / "sample_data" / "features_m3000_b3000_skip2000_seed0_r3_n3984_topk50.csv"
+DEFAULT_CACHE = pathlib.Path(__file__).parent / "sample_data" / "features_m3000_b3000_skip2000_seed0_r3_n3977_topk50.csv"
 
 
 def _build_feature_table(args) -> pd.DataFrame:

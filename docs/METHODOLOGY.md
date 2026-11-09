@@ -12,10 +12,13 @@
 ## 2. Active DNS vs. the paper's Passive DNS
 
 MANTIS builds its hosting graph from Farsight Passive DNS (PDNS): a paid feed
-recording every DNS resolution Farsight's global sensors have ever observed.
-This means the paper's graph includes every domain *ever seen* sharing an IP
-with a seed domain — a sprawling, historically-accumulated "who else lives
-here" view.
+recording DNS resolutions Farsight's global sensors have observed. This gives
+the paper's graph much broader *observed* coverage of domains sharing an IP
+with a seed domain than this project's active-DNS crawl can reach — a
+sprawling, historically-accumulated "who else lives here" view. It is
+observed coverage, not a guarantee of completeness (Farsight only sees what
+its sensors are positioned to see), and MANTIS itself bounds how far its own
+graph expansion goes rather than crawling without limit.
 
 This project has no PDNS access, so it resolves only the fixed seed set
 (malicious + benign domains) via direct Active DNS queries. The hosting
@@ -74,10 +77,20 @@ paper's own ablation structure:
 
 - **Classical ML** (Random Forest, XGBoost) trained on flat feature vectors
   — lexical+hosting alone vs. lexical+hosting+TDA (`src/mantis/classify.py`).
-- **GraphSAGE GNN** (`src/mantis/gnn.py`), a direct reproduction of the
-  paper's own semi-supervised graph neural network, trained transductively
-  over the whole hosting graph with per-domain feature vectors as node
-  inputs — again lexical+hosting-only inputs vs. lexical+hosting+TDA inputs.
+- **GraphSAGE GNN** (`src/mantis/gnn.py`), an independent implementation
+  modeled on the paper's own semi-supervised graph neural network, trained
+  transductively over the whole hosting graph with per-domain feature
+  vectors as node inputs — again lexical+hosting-only inputs vs.
+  lexical+hosting+TDA inputs.
+
+Note: the combined TDA feature block mixes three distinct signals —
+curvature, persistence, and raw neighborhood-size counts (`_TOPO_SIZE_COLS`
+in `src/mantis/classify.py`). The "full" vs. "shape-only" split above exists
+to let someone isolate them, but that ablation hasn't actually been run and
+reported yet (see [RESULTS.md](RESULTS.md)), so any AUC gain attributed to
+"TDA" in this project's results should currently be read as coming from the
+combined topological+structural block, not specifically from persistent
+homology or curvature alone.
 
 ## 5. Paired evaluation design
 

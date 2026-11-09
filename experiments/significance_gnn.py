@@ -13,8 +13,10 @@ Usage: python experiments/significance_gnn.py --n-seeds 10 --epochs 200
 from __future__ import annotations
 
 import argparse
+import gzip
 import multiprocessing
 import pathlib
+import pickle
 
 import pandas as pd
 from scipy import stats
@@ -25,7 +27,9 @@ from mantis.graph import build_hosting_graph, graph_summary
 from mantis.ingest import cymru_bulk_asn, fetch_phishing_db_domains, fetch_tranco_domains, resolve_many
 from mantis_poc import _load_or_build_feature_table
 
-DEFAULT_CACHE = pathlib.Path(__file__).parent / "sample_data" / "features_m3000_b3000_skip2000_seed0_r3_n3984_topk50.csv"
+_SAMPLE_DATA = pathlib.Path(__file__).parent / "sample_data"
+DEFAULT_CACHE = _SAMPLE_DATA / "features_m3000_b3000_skip2000_seed0_r3_n3977_topk50.csv"
+DEFAULT_GRAPH_CACHE = _SAMPLE_DATA / "graph_m3000_b3000_skip2000_seed0_r3_n3977_topk50.pkl.gz"
 N_PROCESSES = 2
 
 
@@ -82,21 +86,25 @@ def main() -> None:
         default=DEFAULT_CACHE,
         help="pre-built feature-table CSV to reuse (default: the bundled sample table)",
     )
-    parser.add_argument("--rebuild", action="store_true", help="ignore --cache and rebuild from scratch")
+    parser.add_argument(
+        "--graph-cache",
+        type=pathlib.Path,
+        default=DEFAULT_GRAPH_CACHE,
+        help="gzip-pickled hosting graph matching --cache (default: the bundled sample graph; "
+        "must be the graph that --cache's feature table was built from, not an independently "
+        "re-fetched one, or features/edges/labels can mismatch)",
+    )
+    parser.add_argument("--rebuild", action="store_true", help="ignore --cache/--graph-cache and rebuild from scratch")
     parser.add_argument("--n-processes", type=int, default=N_PROCESSES)
     args = parser.parse_args()
 
-    if args.cache.exists() and not args.rebuild:
+    if args.cache.exists() and args.graph_cache.exists() and not args.rebuild:
         print(f"Loading cached feature table: {args.cache}")
         df = pd.read_csv(args.cache)
-        print("Rebuilding hosting graph (needed for GNN node features; not stored in the feature-table CSV)...")
-        malicious = fetch_phishing_db_domains(n=args.malicious_n, seed=args.seed)
-        benign = fetch_tranco_domains(n=args.benign_n, skip=args.benign_skip)
-        labels = {d: 1 for d in malicious} | {d: 0 for d in benign}
-        domain_ips = resolve_many(list(labels))
-        all_ips = sorted({ip for ips in domain_ips.values() for ip in ips})
-        ip_info = cymru_bulk_asn(all_ips, timeout=60.0)
-        g = build_hosting_graph(domain_ips, ip_info, labels=labels)
+        print(f"Loading cached hosting graph: {args.graph_cache}")
+        with gzip.open(args.graph_cache, "rb") as f:
+            g = pickle.load(f)
+        labels = dict(zip(df["domain"], df["label"]))
     else:
         df, g, labels = _build_feature_table(args)
 

@@ -1,8 +1,10 @@
-"""MANTIS-TDA: replicate MANTIS (IEEE S&P 2025) malicious-domain detection on
+"""MANTIS-TDA: a MANTIS-inspired (Deniz, Nabeel, Yu, Khalil; IEEE S&P 2025;
+arXiv:2502.09788) active-DNS implementation of malicious-domain detection on
 free, public data (Phishing.Database + Tranco + Team Cymru) since we have no
 Farsight PDNS / VirusTotal feed access, and test whether topological
 (Ollivier-Ricci curvature + persistent homology) features add anything on top
-of the paper's own lexical+hosting features and GraphSAGE GNN encoder.
+of a lexical+hosting feature set and GraphSAGE GNN encoder modeled on the
+paper's own design.
 
 Consequence of no PDNS: the hosting graph is built from *active* DNS
 resolution of our own seed domains only, not a passive-DNS crawl of
